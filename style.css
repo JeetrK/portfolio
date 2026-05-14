@@ -1,11 +1,23 @@
 :root {
 	--bg: #05070b;
+	--bg-spot-1: rgba(95, 232, 255, 0.14);
+	--bg-spot-2: rgba(255, 107, 129, 0.14);
+	--bg-spot-3: rgba(255, 201, 87, 0.1);
+	--bg-start: #040508;
+	--bg-mid: #070911;
+	--bg-end: #030407;
 	--surface: rgba(15, 18, 26, 0.82);
 	--surface-strong: rgba(26, 32, 44, 0.96);
 	--line: rgba(255, 255, 255, 0.12);
 	--text: rgba(255, 255, 255, 0.86);
 	--muted: rgba(255, 255, 255, 0.45);
 	--shadow: rgba(0, 0, 0, 0.42);
+	--card-accent: rgba(113, 250, 255, 0.18);
+	--card-accent-strong: rgba(113, 250, 255, 0.72);
+	--card-surface: rgba(24, 31, 46, 0.96);
+	--card-surface-soft: rgba(36, 44, 60, 0.92);
+	--card-shadow: rgba(0, 0, 0, 0.42);
+	--card-label-bg: rgba(6, 8, 14, 0.42);
 	--card-width: min(58vw, 720px);
 	--card-height: min(68vh, 620px);
 	--top-y: -18vh;
@@ -23,21 +35,56 @@ body {
 }
 
 body {
+	position: relative;
 	overflow-x: hidden;
-	background:
-		radial-gradient(circle at 15% 20%, rgba(95, 232, 255, 0.14), transparent 30%),
-		radial-gradient(circle at 82% 16%, rgba(255, 107, 129, 0.14), transparent 26%),
-		radial-gradient(circle at 50% 100%, rgba(255, 201, 87, 0.1), transparent 32%),
-		linear-gradient(180deg, #040508 0%, #070911 52%, #030407 100%);
+	background: linear-gradient(180deg, #020305 0%, #060912 52%, #020304 100%);
 	color: var(--text);
 	font-family: "Syne", "Segoe UI", sans-serif;
 }
+
+.bg-transition {
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	overflow: hidden;
+	z-index: 0;
+	background: linear-gradient(180deg, rgba(2, 3, 5, 0.94), rgba(6, 9, 18, 0.96));
+	}
+
+.bg-theme {
+	position: absolute;
+	inset: -12%;
+	opacity: 0;
+	transform: scale(1.08) rotate(var(--theme-rotation, 0deg));
+	transform-origin: center;
+	filter: saturate(118%) blur(0px);
+	transition: opacity 900ms cubic-bezier(0.22, 1, 0.36, 1), transform 1200ms cubic-bezier(0.22, 1, 0.36, 1), filter 1200ms ease;
+	background:
+		radial-gradient(circle at calc(22% + var(--theme-orbit, 18%)) 20%, var(--theme-spot-1), transparent 34%),
+		radial-gradient(circle at calc(82% - var(--theme-orbit, 18%)) 24%, var(--theme-spot-2), transparent 32%),
+		radial-gradient(circle at 50% calc(88% - (var(--theme-orbit, 18%) * 0.4)), var(--theme-spot-3), transparent 34%),
+		conic-gradient(from var(--theme-angle, 45deg) at 50% 50%, transparent 0deg, var(--theme-ring-1) 72deg, transparent 144deg, var(--theme-ring-2) 232deg, transparent 288deg, var(--theme-ring-3) 360deg),
+		linear-gradient(180deg, var(--theme-start, #040508) 0%, var(--theme-mid, #070911) 52%, var(--theme-end, #030407) 100%);
+	animation: auroraDrift 16s ease-in-out infinite alternate;
+	}
+
+.bg-theme--b {
+	animation-duration: 20s;
+	animation-direction: alternate-reverse;
+	}
+
+.bg-theme.is-active {
+	opacity: 1;
+	transform: scale(1) rotate(calc(var(--theme-rotation, 0deg) * -0.35));
+	filter: saturate(128%) blur(0px);
+	}
 
 body::before {
 	content: "";
 	position: fixed;
 	inset: 0;
 	pointer-events: none;
+	z-index: 1;
 	background-image:
 		linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
 		linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
@@ -49,6 +96,7 @@ body::before {
 
 .experience {
 	position: relative;
+	z-index: 2;
 }
 
 .stack-scroll {
@@ -81,16 +129,17 @@ body::before {
 	border-radius: 2rem;
 	border: 1px solid var(--line);
 	background:
-		linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015)),
-		var(--surface);
+		linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02)),
+		linear-gradient(135deg, var(--card-accent), var(--card-surface) 62%, var(--card-surface-soft));
 	box-shadow:
-		0 30px 80px var(--shadow),
+		0 30px 80px var(--card-shadow),
 		inset 0 0 0 1px rgba(255, 255, 255, 0.025);
 	backdrop-filter: blur(18px);
 	-webkit-backdrop-filter: blur(18px);
 	transform: translate3d(-50%, -50%, 0);
 	transform-origin: center center;
 	will-change: transform, opacity, filter;
+	transition: background 320ms ease, box-shadow 320ms ease;
 	overflow: hidden;
 	}
 
@@ -108,7 +157,7 @@ body::before {
 	aspect-ratio: 1;
 	top: -8%;
 	right: -8%;
-	background: radial-gradient(circle, rgba(255, 255, 255, 0.18), transparent 68%);
+	background: radial-gradient(circle, var(--card-accent-strong), transparent 68%);
 	}
 
 .stack-card::after {
@@ -116,7 +165,7 @@ body::before {
 	aspect-ratio: 1;
 	bottom: -15%;
 	left: -10%;
-	background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent 70%);
+	background: radial-gradient(circle, var(--card-accent), transparent 70%);
 	}
 
 .stack-card__label {
@@ -127,7 +176,7 @@ body::before {
 	max-width: calc(100% - 2.5rem);
 	padding: 0.75rem 0.9rem 0.85rem;
 	border-radius: 1rem;
-	background: rgba(6, 8, 14, 0.42);
+	background: var(--card-label-bg);
 	backdrop-filter: blur(10px);
 	-webkit-backdrop-filter: blur(10px);
 	font-size: clamp(0.95rem, 1vw, 1.15rem);
@@ -162,54 +211,6 @@ body::before {
 	object-fit: contain;
 	object-position: center;
 	filter: drop-shadow(0 1.25rem 2rem rgba(0, 0, 0, 0.32));
-	}
-
-.card-1 {
-	background:
-		linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015)),
-		linear-gradient(135deg, rgba(113, 250, 255, 0.18), rgba(24, 31, 46, 0.96));
-	}
-
-.card-2 {
-	background:
-		linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015)),
-		linear-gradient(135deg, rgba(255, 122, 146, 0.18), rgba(31, 22, 35, 0.96));
-	}
-
-.card-3 {
-	background:
-		linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015)),
-		linear-gradient(135deg, rgba(255, 207, 107, 0.18), rgba(31, 27, 19, 0.96));
-	}
-
-.card-4 {
-	background:
-		linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015)),
-		linear-gradient(135deg, rgba(136, 255, 188, 0.18), rgba(22, 31, 28, 0.96));
-	}
-
-.card-5 {
-	background:
-		linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015)),
-		linear-gradient(135deg, rgba(154, 141, 255, 0.18), rgba(24, 20, 38, 0.96));
-	}
-
-.card-6 {
-	background:
-		linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015)),
-		linear-gradient(135deg, rgba(255, 168, 115, 0.18), rgba(38, 24, 20, 0.96));
-	}
-
-.card-7 {
-	background:
-		linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015)),
-		linear-gradient(135deg, rgba(124, 237, 209, 0.18), rgba(18, 33, 36, 0.96));
-	}
-
-.card-8 {
-	background:
-		linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015)),
-		linear-gradient(135deg, rgba(255, 129, 208, 0.18), rgba(35, 18, 30, 0.96));
 	}
 
 .stack-progress {
@@ -277,9 +278,26 @@ body::before {
 	}
 
 @media (prefers-reduced-motion: reduce) {
+	.bg-theme,
 	.stack-card,
 	.stack-progress__dot {
 		transition: none;
+		animation: none;
+	}
+	}
+
+@keyframes auroraDrift {
+	0% {
+		transform: translate3d(-2%, -1%, 0) scale(1.06) rotate(var(--theme-rotation, 0deg));
+		filter: saturate(114%) hue-rotate(-8deg);
+	}
+	50% {
+		transform: translate3d(1.5%, 2.5%, 0) scale(1.12) rotate(calc(var(--theme-rotation, 0deg) + 6deg));
+		filter: saturate(130%) hue-rotate(6deg);
+	}
+	100% {
+		transform: translate3d(3%, -2%, 0) scale(1.08) rotate(calc(var(--theme-rotation, 0deg) - 5deg));
+		filter: saturate(120%) hue-rotate(-4deg);
 	}
 	}
 
