@@ -1,13 +1,66 @@
-const cards = Array.from(document.querySelectorAll(".stack-card"));
-const dots = Array.from(document.querySelectorAll(".stack-progress__dot"));
+const imageFiles = [
+	"Array Practice.png",
+	"Calculator and Java Practice.png",
+	"Client Project.png",
+	"College Website.png",
+	"gallery1.png",
+	"Hangman.png",
+	"Holiday Game Project.png",
+	"JSON Practice.png",
+	"Madlib.png",
+	"Magic 8 Ball.png",
+	"Medieval Name Generator .png",
+	"Mock Client Project.png",
+	"NJIT-Project.png",
+	"President Project.png",
+	"Problem Solving Project.png",
+	"Rock Paper Scissors.png",
+	"Roster Project.png"
+];
+
+const stackStage = document.querySelector("#stack-stage");
+const stackProgress = document.querySelector("#stack-progress");
 const stackSection = document.querySelector(".stack-scroll");
+
+let cards = [];
+let dots = [];
 
 const state = {
 	current: 0,
 	target: 0,
-	max: Math.max(cards.length - 1, 0),
+	max: 0,
 	reduceMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches
 };
+
+function getTitleFromFilename(fileName) {
+	return fileName.replace(/\.[^.]+$/, "").trim();
+}
+
+function buildStack() {
+	const cardsMarkup = imageFiles.map((fileName, index) => {
+		const title = getTitleFromFilename(fileName);
+		const accentClass = `card-${index % 8 + 1}`;
+
+		return `
+			<div class="stack-card ${accentClass}" data-index="${index}">
+				<div class="stack-card__label">${title}</div>
+				<div class="stack-card__media">
+					<img class="stack-card__image" src="imgs/${encodeURIComponent(fileName)}" alt="${title}">
+				</div>
+			</div>`;
+	}).join("");
+
+	const dotsMarkup = imageFiles.map((_, index) => (
+		`<span class="stack-progress__dot${index === 0 ? " is-active" : ""}"></span>`
+	)).join("");
+
+	stackStage.innerHTML = cardsMarkup;
+	stackProgress.innerHTML = dotsMarkup;
+
+	cards = Array.from(document.querySelectorAll(".stack-card"));
+	dots = Array.from(document.querySelectorAll(".stack-progress__dot"));
+	state.max = Math.max(cards.length - 1, 0);
+}
 
 function clamp(value, min, max) {
 	return Math.min(Math.max(value, min), max);
@@ -90,6 +143,7 @@ function resizeSection() {
 	state.max = Math.max(cards.length - 1, 0);
 }
 
+buildStack();
 window.addEventListener("resize", resizeSection);
 
 resizeSection();
