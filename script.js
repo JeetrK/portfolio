@@ -40,12 +40,16 @@ function createBackgroundLayers() {
 		<div class="bg-theme bg-theme--a is-active"></div>
 		<div class="bg-theme bg-theme--b"></div>`;
 	document.body.prepend(host);
-	return Array.from(host.querySelectorAll(".bg-theme"));
+	return {
+		host,
+		themes: Array.from(host.querySelectorAll(".bg-theme"))
+	};
 }
 
 let cards = [];
 let dots = [];
-const backgroundLayers = createBackgroundLayers();
+const background = createBackgroundLayers();
+const backgroundLayers = background.themes;
 
 const fallbackPalette = {
 	accent: { r: 113, g: 250, b: 255 },
