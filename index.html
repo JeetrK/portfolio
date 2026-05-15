@@ -6,10 +6,24 @@
 	<title>Stack Scroll Study</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="is-intro-active">
+	<div class="intro-screen" id="intro-screen" aria-hidden="true">
+		<div class="intro-screen__halo"></div>
+		<div class="intro-screen__grid"></div>
+		<div class="intro-screen__beam intro-screen__beam--left"></div>
+		<div class="intro-screen__beam intro-screen__beam--right"></div>
+		<div class="intro-screen__inner">
+			<p class="intro-screen__kicker">Portfolio</p>
+			<h1 class="intro-screen__title" aria-label="Harrison Klein">
+				<span class="intro-screen__word intro-screen__word--first">Harrison</span>
+				<span class="intro-screen__word intro-screen__word--last">Klein</span>
+			</h1>
+		</div>
+	</div>
 	<main class="experience">
 		<section class="stack-scroll" aria-label="Stacked div scroll effect">
 			<div class="stack-pin">

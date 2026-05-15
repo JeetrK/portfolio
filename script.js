@@ -21,6 +21,7 @@ const imageFiles = [
 const stackStage = document.querySelector("#stack-stage");
 const stackProgress = document.querySelector("#stack-progress");
 const stackSection = document.querySelector(".stack-scroll");
+const introScreen = document.querySelector("#intro-screen");
 const SCROLL_KEYS = new Set([
 	"ArrowDown",
 	"ArrowUp",
@@ -32,6 +33,7 @@ const SCROLL_KEYS = new Set([
 const TOUCH_STEP_THRESHOLD = 40;
 const SECTION_STEP_VH = 85;
 const PALETTE_SAMPLE_SIZE = 24;
+const INTRO_DURATION_MS = 2600;
 
 function createBackgroundLayers() {
 	const host = document.createElement("div");
@@ -496,7 +498,34 @@ function handleTouchEnd() {
 	state.touchStartY = 0;
 }
 
+function dismissIntro() {
+	if (!introScreen) {
+		return;
+	}
+
+	introScreen.classList.add("is-splitting");
+	document.body.classList.remove("is-intro-active");
+
+	window.setTimeout(() => {
+		introScreen.remove();
+	}, 1150);
+}
+
+function initIntro() {
+	if (!introScreen) {
+		return;
+	}
+
+	if (state.reduceMotion) {
+		dismissIntro();
+		return;
+	}
+
+	window.setTimeout(dismissIntro, INTRO_DURATION_MS);
+}
+
 buildStack();
+initIntro();
 window.addEventListener("resize", resizeSection);
 window.addEventListener("wheel", handleWheel, { passive: false });
 window.addEventListener("keydown", handleKeydown);
