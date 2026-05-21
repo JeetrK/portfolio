@@ -1,21 +1,21 @@
-const imageFiles = [
-	"Array Practice.png",
-	"Calculator and Java Practice.png",
-	"Client Project.png",
-	"College Website.png",
-	"gallery1.png",
-	"Hangman.png",
-	"Holiday Game Project.png",
-	"JSON Practice.png",
-	"Madlib.png",
-	"Magic 8 Ball.png",
-	"Medieval Name Generator .png",
-	"Mock Client Project.png",
-	"NJIT-Project.png",
-	"President Project.png",
-	"Problem Solving Project.png",
-	"Rock Paper Scissors.png",
-	"Roster Project.png"
+const projectCards = [
+	{ fileName: "Array Practice.png", href: "" },
+	{ fileName: "Calculator and Java Practice.png", href: "" },
+	{ fileName: "Client Project.png", href: "" },
+	{ fileName: "College Website.png", href: "" },
+	{ fileName: "gallery1.png", href: "https://github.com/JeetrK/MonthlyWebsiteGallery" },
+	{ fileName: "Hangman.png", href: "" },
+	{ fileName: "Holiday Game Project.png", href: "" },
+	{ fileName: "JSON Practice.png", href: "" },
+	{ fileName: "Madlib.png", href: "https://github.com/JeetrK/November-Monthly-Website" },
+	{ fileName: "Magic 8 Ball.png", href: "https://github.com/JeetrK/magic-ball" },
+	{ fileName: "Medieval Name Generator .png", href: "" },
+	{ fileName: "Mock Client Project.png", href: "" },
+	{ fileName: "NJIT-Project.png", href: "" },
+	{ fileName: "President Project.png", href: "" },
+	{ fileName: "Problem Solving Project.png", href: "" },
+	{ fileName: "Rock Paper Scissors.png", href: "" },
+	{ fileName: "Roster Project.png", href: "" }
 ];
 
 const stackStage = document.querySelector("#stack-stage");
@@ -52,6 +52,8 @@ let cards = [];
 let dots = [];
 const background = createBackgroundLayers();
 const backgroundLayers = background.themes;
+
+stackStage.addEventListener("click", handleCardLinkClick);
 
 const fallbackPalette = {
 	accent: { r: 113, g: 250, b: 255 },
@@ -294,19 +296,25 @@ function hydrateCardPalette(card) {
 }
 
 function buildStack() {
-	const cardsMarkup = imageFiles.map((fileName, index) => {
+	const cardsMarkup = projectCards.map((project, index) => {
+		const { fileName, href } = project;
 		const title = getTitleFromFilename(fileName);
+		const linkAttributes = href
+			? `href="${href}" target="_blank" rel="noreferrer"`
+			: 'href=""';
 
 		return `
 			<div class="stack-card" data-index="${index}">
 				<div class="stack-card__label">${title}</div>
 				<div class="stack-card__media">
-					<img class="stack-card__image" src="imgs/${encodeURIComponent(fileName)}" alt="${title}">
+					<a class="stack-card__link" ${linkAttributes} aria-label="Open ${title}">
+						<img class="stack-card__image" src="imgs/${encodeURIComponent(fileName)}" alt="${title}">
+					</a>
 				</div>
 			</div>`;
 	}).join("");
 
-	const dotsMarkup = imageFiles.map((_, index) => (
+	const dotsMarkup = projectCards.map((_, index) => (
 		`<span class="stack-progress__dot${index === 0 ? " is-active" : ""}"></span>`
 	)).join("");
 
@@ -317,6 +325,18 @@ function buildStack() {
 	dots = Array.from(document.querySelectorAll(".stack-progress__dot"));
 	state.max = Math.max(cards.length - 1, 0);
 	cards.forEach(hydrateCardPalette);
+}
+
+function handleCardLinkClick(event) {
+	const link = event.target.closest(".stack-card__link");
+
+	if (!link) {
+		return;
+	}
+
+	if (!link.getAttribute("href").trim()) {
+		event.preventDefault();
+	}
 }
 
 function setActiveDot(index) {
@@ -437,6 +457,7 @@ function render() {
 		card.style.zIndex = String(cards.length - Math.round(relativeIndex * 10));
 		card.style.opacity = isSettledFocus ? "1" : transform.opacity.toFixed(3);
 		card.style.filter = `blur(${transform.blur.toFixed(2)}px)`;
+		card.style.pointerEvents = isSettledFocus ? "auto" : "none";
 		card.style.transform = `translate3d(calc(-50% + ${transform.x}vw), calc(-50% + ${transform.y}vh), ${transform.z}px) scale(${transform.scale}) rotate(${transform.rotate}deg)`;
 	});
 

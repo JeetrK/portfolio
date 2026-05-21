@@ -414,6 +414,19 @@ body::before {
 	padding: 5.6rem 1.5rem 1.5rem;
 	}
 
+.stack-card__link {
+	display: block;
+	width: 100%;
+	height: 100%;
+	outline: none;
+	cursor: pointer;
+	}
+
+.stack-card__link:focus-visible {
+	border-radius: 1.2rem;
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.36);
+	}
+
 .stack-card__image {
 	width: 100%;
 	height: 100%;
