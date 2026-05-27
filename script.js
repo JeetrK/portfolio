@@ -1,21 +1,21 @@
 const projectCards = [
-	{ fileName: "Array Practice.png", href: "" },
-	{ fileName: "Calculator and Java Practice.png", href: "" },
-	{ fileName: "Client Project.png", href: "" },
-	{ fileName: "College Website.png", href: "" },
-	{ fileName: "gallery1.png", href: "https://github.com/JeetrK/MonthlyWebsiteGallery" },
-	{ fileName: "Hangman.png", href: "" },
-	{ fileName: "Holiday Game Project.png", href: "" },
-	{ fileName: "JSON Practice.png", href: "" },
-	{ fileName: "Madlib.png", href: "https://github.com/JeetrK/November-Monthly-Website" },
-	{ fileName: "Magic 8 Ball.png", href: "https://github.com/JeetrK/magic-ball" },
-	{ fileName: "Medieval Name Generator .png", href: "" },
-	{ fileName: "Mock Client Project.png", href: "" },
-	{ fileName: "NJIT-Project.png", href: "" },
-	{ fileName: "President Project.png", href: "" },
-	{ fileName: "Problem Solving Project.png", href: "" },
-	{ fileName: "Rock Paper Scissors.png", href: "" },
-	{ fileName: "Roster Project.png", href: "" }
+    { fileName: "gallery1.png", href: "https://github.com/JeetrK/MonthlyWebsiteGallery" },
+    { fileName: "Madlib.png", href: "https://github.com/JeetrK/November-Monthly-Website" },
+    { fileName: "Magic 8 Ball.png", href: "https://github.com/JeetrK/magic-ball" },
+    { fileName: "Medieval Name Generator .png", href: "https://github.com/JeetrK/december-monthly-website" },
+    { fileName: "Rock Paper Scissors.png", href: "https://github.com/JeetrK/Rock-Paper-Scissor" },
+    { fileName: "President Project.png", href: "https://github.com/JeetrK/obama-site" },
+    { fileName: "Hangman.png", href: "https://github.com/JeetrK/hangman" },
+    { fileName: "Calculator and Java Practice.png", href: "https://github.com/JeetrK/AprilMonthlyWebsite" },
+    { fileName: "Array Practice.png", href: "https://github.com/JeetrK/array-refresher" },
+    { fileName: "JSON Practice.png", href: "https://github.com/JeetrK/JSON-project" },
+    { fileName: "NJIT-Project.png", href: "https://github.com/JeetrK/NJIT-project" },
+    { fileName: "Roster Project.png", href: "https://github.com/JeetrK/MayMonthlyWebsite" },
+    { fileName: "College Website.png", href: "https://github.com/JeetrK/College-website" },
+    { fileName: "Mock Client Project.png", href: "https://github.com/JeetrK/JuneMonthlyWebsite" },
+    { fileName: "Holiday Game Project.png", href: "https://github.com/JeetrK/Christmas-project" },
+    { fileName: "Problem Solving Project.png", href: "https://github.com/JeetrK/VintageClientSite" },
+    { fileName: "Client Project.png", href: "https://github.com/JeetrK/VintageClientSite" }
 ];
 
 const stackStage = document.querySelector("#stack-stage");
@@ -32,8 +32,22 @@ const SCROLL_KEYS = new Set([
 ]);
 const TOUCH_STEP_THRESHOLD = 40;
 const SECTION_STEP_VH = 85;
-const PALETTE_SAMPLE_SIZE = 24;
+const PALETTE_SAMPLE_SIZE = 16;
+const VISIBLE_LOAD_COUNT = 3;
 const INTRO_DURATION_MS = 2600;
+
+function scheduleIdle(work, timeout = 1000) {
+	if ('requestIdleCallback' in window) {
+		try {
+			requestIdleCallback(work, { timeout });
+			return;
+		} catch {
+			// fallback to setTimeout
+		}
+	}
+
+	setTimeout(work, 120);
+}
 
 function createBackgroundLayers() {
 	const host = document.createElement("div");
@@ -48,8 +62,11 @@ function createBackgroundLayers() {
 	};
 }
 
-let cards = [];
+let visualNodes = new Map();
 let dots = [];
+const palettes = [];
+const VIRTUAL_WINDOW = 5; // odd number of cards to keep in DOM centered on current
+let lastWindowCenter = -1;
 const background = createBackgroundLayers();
 const backgroundLayers = background.themes;
 
@@ -251,11 +268,11 @@ function setBackgroundLayerTheme(layer, palette, index) {
 }
 
 function applyPageTheme(index) {
-	if (index === state.activeThemeIndex || !cards[index]) {
+	if (index === state.activeThemeIndex) {
 		return;
 	}
 
-	const palette = cards[index].palette || fallbackPalette;
+	const palette = palettes[index] || fallbackPalette;
 	const nextLayerIndex = state.activeThemeLayer === 0 ? 1 : 0;
 	const nextLayer = backgroundLayers[nextLayerIndex];
 	const currentLayer = backgroundLayers[state.activeThemeLayer];
@@ -274,17 +291,35 @@ function hydrateCardPalette(card) {
 		return;
 	}
 
-	const updatePalette = () => {
-		const palette = getImagePalette(image);
-		const cardIndex = Number(card.dataset.index);
-		card.palette = palette;
-		applyCardTheme(card, palette);
-
-		if (cardIndex === clamp(Math.round(state.current), 0, state.max)) {
-			state.activeThemeIndex = -1;
+	const schedulePaletteWork = (work) => {
+		if ('requestIdleCallback' in window) {
+			try {
+				requestIdleCallback(work, { timeout: 1000 });
+				return;
+			} catch {
+				// fallthrough to setTimeout
+			}
 		}
 
-		applyPageTheme(clamp(Math.round(state.current), 0, state.max));
+		setTimeout(work, 200);
+	};
+
+
+	const updatePalette = () => {
+		const run = () => {
+			const palette = getImagePalette(image);
+			const cardIndex = Number(card.dataset.index);
+			palettes[cardIndex] = palette;
+			applyCardTheme(card, palette);
+
+			if (cardIndex === clamp(Math.round(state.current), 0, state.max)) {
+				state.activeThemeIndex = -1;
+			}
+
+			applyPageTheme(clamp(Math.round(state.current), 0, state.max));
+		};
+
+		schedulePaletteWork(run);
 	};
 
 	if (image.complete && image.naturalWidth) {
@@ -296,35 +331,84 @@ function hydrateCardPalette(card) {
 }
 
 function buildStack() {
-	const cardsMarkup = projectCards.map((project, index) => {
-		const { fileName, href } = project;
-		const title = getTitleFromFilename(fileName);
-		const linkAttributes = href
-			? `href="${href}" target="_blank" rel="noreferrer"`
-			: 'href=""';
-
-		return `
-			<div class="stack-card" data-index="${index}">
-				<div class="stack-card__label">${title}</div>
-				<div class="stack-card__media">
-					<a class="stack-card__link" ${linkAttributes} aria-label="Open ${title}">
-						<img class="stack-card__image" src="imgs/${encodeURIComponent(fileName)}" alt="${title}">
-					</a>
-				</div>
-			</div>`;
-	}).join("");
-
 	const dotsMarkup = projectCards.map((_, index) => (
 		`<span class="stack-progress__dot${index === 0 ? " is-active" : ""}"></span>`
 	)).join("");
 
-	stackStage.innerHTML = cardsMarkup;
+	stackStage.innerHTML = "";
 	stackProgress.innerHTML = dotsMarkup;
 
-	cards = Array.from(document.querySelectorAll(".stack-card"));
 	dots = Array.from(document.querySelectorAll(".stack-progress__dot"));
-	state.max = Math.max(cards.length - 1, 0);
-	cards.forEach(hydrateCardPalette);
+	state.max = Math.max(projectCards.length - 1, 0);
+
+	// create initial virtual window
+	ensureWindow(0);
+
+	// preload remaining images in idle time to warm cache
+	const total = projectCards.length;
+	const preload = () => {
+		for (let i = VISIBLE_LOAD_COUNT; i < total; i++) {
+			((idx) => {
+				scheduleIdle(() => {
+					const img = new Image();
+					img.decoding = 'async';
+					img.src = `imgs/${encodeURIComponent(projectCards[idx].fileName)}`;
+				}, 800 + (idx - VISIBLE_LOAD_COUNT) * 60);
+			})(i);
+		}
+	};
+
+	scheduleIdle(preload, 1200);
+}
+
+function createCardNode(index) {
+	const project = projectCards[index];
+	const title = getTitleFromFilename(project.fileName);
+	const linkAttributes = project.href
+		? `href="${project.href}" target="_blank" rel="noreferrer"`
+		: 'href=""';
+
+	const node = document.createElement('div');
+	node.className = 'stack-card';
+	node.dataset.index = String(index);
+	node.innerHTML = `
+		<div class="stack-card__label">${title}</div>
+		<div class="stack-card__media">
+			<a class="stack-card__link" ${linkAttributes} aria-label="Open ${title}">
+				<img class="stack-card__image" src="imgs/${encodeURIComponent(project.fileName)}" loading="lazy" decoding="async" alt="${title}">
+			</a>
+		</div>`;
+
+	return node;
+}
+
+function ensureWindow(centerIndex) {
+	const half = Math.floor(VIRTUAL_WINDOW / 2);
+	let start = Math.max(0, Math.round(centerIndex) - half);
+	let end = Math.min(state.max, start + VIRTUAL_WINDOW - 1);
+	// adjust start if we're near the end
+	start = Math.max(0, Math.min(start, Math.max(0, state.max - VIRTUAL_WINDOW + 1)));
+
+	// remove nodes outside [start, end]
+	for (const key of Array.from(visualNodes.keys())) {
+		if (key < start || key > end) {
+			const node = visualNodes.get(key);
+			if (node && node.parentElement === stackStage) {
+				stackStage.removeChild(node);
+			}
+			visualNodes.delete(key);
+		}
+	}
+
+	// add nodes inside window
+	for (let i = start; i <= end; i++) {
+		if (!visualNodes.has(i)) {
+			const node = createCardNode(i);
+			visualNodes.set(i, node);
+			stackStage.appendChild(node);
+			hydrateCardPalette(node);
+		}
+	}
 }
 
 function handleCardLinkClick(event) {
@@ -450,23 +534,35 @@ function render() {
 	setActiveDot(activeIndex);
 	applyPageTheme(activeIndex);
 
-	cards.forEach((card, index) => {
+	visualNodes.forEach((card, index) => {
 		const relativeIndex = index - state.current;
 		const transform = getCardTransform(relativeIndex, index);
 		const isSettledFocus = !state.isStepping && index === activeIndex;
-		card.style.zIndex = String(cards.length - Math.round(relativeIndex * 10));
+		card.style.zIndex = String(projectCards.length - Math.round(relativeIndex * 10));
 		card.style.opacity = isSettledFocus ? "1" : transform.opacity.toFixed(3);
-		card.style.filter = `blur(${transform.blur.toFixed(2)}px)`;
+		const blurPx = transform.blur;
+		if (blurPx > 1) {
+			card.style.filter = `blur(${blurPx.toFixed(2)}px)`;
+		} else {
+			card.style.filter = "none";
+		}
 		card.style.pointerEvents = isSettledFocus ? "auto" : "none";
 		card.style.transform = `translate3d(calc(-50% + ${transform.x}vw), calc(-50% + ${transform.y}vh), ${transform.z}px) scale(${transform.scale}) rotate(${transform.rotate}deg)`;
 	});
+
+	// update virtual window when center moves
+	const windowCenter = Math.round(activeIndex);
+	if (windowCenter !== lastWindowCenter) {
+		ensureWindow(windowCenter);
+		lastWindowCenter = windowCenter;
+	}
 
 	requestAnimationFrame(render);
 }
 
 function resizeSection() {
-	stackSection.style.height = `${cards.length * SECTION_STEP_VH}vh`;
-	state.max = Math.max(cards.length - 1, 0);
+	stackSection.style.height = `${projectCards.length * SECTION_STEP_VH}vh`;
+	state.max = Math.max(projectCards.length - 1, 0);
 	state.target = clamp(Math.round(state.target), 0, state.max);
 	state.current = clamp(state.current, 0, state.max);
 	syncScrollToTarget();
