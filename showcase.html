@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Showcase - Portfolio</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<header class="page-header">
+		<nav class="page-nav">
+			<a href="index.html" class="nav-link">Home</a>
+			<span class="nav-divider">/</span>
+			<span class="nav-current">Showcase</span>
+		</nav>
+	</header>
+
+	<main class="showcase-main">
+		<section class="showcase-section" aria-label="Project showcase carousel">
+			<div class="showcase-container">
+				<button class="carousel-btn carousel-btn--prev" aria-label="Previous project" id="prev-btn">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<polyline points="15 18 9 12 15 6"></polyline>
+					</svg>
+				</button>
+
+				<div class="carousel-wrapper">
+					<div class="cards-carousel" id="cards-carousel">
+						<!-- Cards will be generated here -->
+					</div>
+				</div>
+
+				<button class="carousel-btn carousel-btn--next" aria-label="Next project" id="next-btn">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<polyline points="9 18 15 12 9 6"></polyline>
+					</svg>
+				</button>
+			</div>
+
+			<div class="carousel-indicators" id="carousel-indicators"></div>
+		</section>
+	</main>
+
+	<script src="showcase.js"></script>
+</body>
+</html>
