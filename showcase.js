@@ -1,21 +1,7 @@
 const projectCards = [
-	{ fileName: "gallery1.png", title: "Monthly Gallery" },
-	{ fileName: "Madlib.png", title: "Madlib Game" },
-	{ fileName: "Magic 8 Ball.png", title: "Magic 8 Ball" },
-	{ fileName: "Medieval Name Generator .png", title: "Name Generator" },
-	{ fileName: "Rock Paper Scissors.png", title: "Rock Paper Scissors" },
-	{ fileName: "President Project.png", title: "President Site" },
-	{ fileName: "Hangman.png", title: "Hangman Game" },
-	{ fileName: "Calculator and Java Practice.png", title: "Calculator App" },
-	{ fileName: "Array Practice.png", title: "Array Practice" },
-	{ fileName: "JSON Practice.png", title: "JSON Project" },
-	{ fileName: "NJIT-Project.png", title: "NJIT Project" },
 	{ fileName: "Roster Project.png", title: "Roster Project" },
-	{ fileName: "College Website.png", title: "College Website" },
-	{ fileName: "Mock Client Project.png", title: "Client Project" },
-	{ fileName: "Holiday Game Project.png", title: "Holiday Game" },
 	{ fileName: "Problem Solving Project.png", title: "Problem Solving" },
-	{ fileName: "Client Project.png", title: "Client Work" }
+	{ fileName: "Holiday Game Project.png", title: "Holiday Game" }
 ];
 
 let currentIndex = 0;
@@ -31,6 +17,7 @@ function initCarousel() {
 		const cardElement = document.createElement("div");
 		cardElement.className = "carousel-card";
 		cardElement.innerHTML = `
+			<div class="stack-card__label">${card.title}</div>
 			<div class="card-content">
 				<img src="imgs/${card.fileName}" alt="${card.title}" class="card-image">
 				<div class="card-overlay">
@@ -46,7 +33,7 @@ function initCarousel() {
 		const indicator = document.createElement("button");
 		indicator.className = "indicator-dot";
 		if (index === 0) indicator.classList.add("is-active");
-		indicator.aria-label = `Go to project ${index + 1}`;
+		indicator.setAttribute("aria-label", `Go to project ${index + 1}`);
 		indicator.addEventListener("click", () => goToSlide(index));
 		indicators.appendChild(indicator);
 	});

@@ -46,6 +46,29 @@ body {
 	background: radial-gradient(circle at top, #2a2032 0%, #120f18 30%, #07070d 66%, #020204 100%);
 	color: var(--text);
 	font-family: "Syne", "Segoe UI", sans-serif;
+	animation: pageInTransition 600ms ease-in-out forwards;
+}
+
+@keyframes pageInTransition {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+body.is-page-exiting {
+	animation: pageOutTransition 400ms ease-in-out forwards;
+}
+
+@keyframes pageOutTransition {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
 }
 
 body.is-intro-active {
@@ -836,6 +859,20 @@ body::before {
 	padding: 4rem 2rem;
 }
 
+.showcase-title {
+	position: absolute;
+	top: 5rem;
+	left: 50%;
+	transform: translateX(-50%);
+	margin: 0;
+	font-family: "Syncopate", "Syne", sans-serif;
+	font-size: clamp(2rem, 5vw, 3rem);
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--text);
+}
+
 .showcase-section {
 	width: 100%;
 	max-width: 1400px;
@@ -859,6 +896,7 @@ body::before {
 	perspective: 1200px;
 	position: relative;
 	overflow: hidden;
+	height: 100%;
 }
 
 .cards-carousel {
@@ -916,18 +954,21 @@ body::before {
 	transform: translateX(0) translateZ(0) scale(1);
 	z-index: 20;
 	pointer-events: auto;
+	animation: cardFloat 4s ease-in-out infinite;
 }
 
 .carousel-card.is-left {
 	opacity: 0.35;
 	transform: translateX(-55%) translateZ(-200px) scale(0.8);
 	z-index: 10;
+	animation: cardFloatLeft 5s ease-in-out infinite;
 }
 
 .carousel-card.is-right {
 	opacity: 0.35;
 	transform: translateX(55%) translateZ(-200px) scale(0.8);
 	z-index: 10;
+	animation: cardFloatRight 5.5s ease-in-out infinite;
 }
 
 .card-content {
@@ -938,7 +979,7 @@ body::before {
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	padding: 2rem;
+	padding: 5.6rem 1.5rem 1.5rem;
 	background: linear-gradient(135deg, rgba(24, 31, 46, 0.96), rgba(36, 44, 60, 0.92));
 }
 
@@ -964,6 +1005,33 @@ body::before {
 
 .carousel-card.is-center .card-overlay {
 	opacity: 1;
+}
+
+.carousel-card .stack-card__label {
+	position: absolute;
+	left: 1.25rem;
+	top: 1.2rem;
+	z-index: 2;
+	max-width: calc(100% - 2.5rem);
+	padding: 0.75rem 0.9rem 0.85rem;
+	border-radius: 1rem;
+	background: var(--card-label-bg);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	font-size: clamp(0.95rem, 1vw, 1.15rem);
+	font-weight: 700;
+	letter-spacing: 0.24em;
+	text-transform: uppercase;
+	color: var(--muted);
+}
+
+.carousel-card .stack-card__label::after {
+	content: "";
+	display: block;
+	width: clamp(3rem, 7vw, 5rem);
+	height: 2px;
+	margin-top: 0.9rem;
+	background: rgba(255, 255, 255, 0.18);
 }
 
 .card-title {
